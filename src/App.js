@@ -1,24 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import { HashRouter } from 'react-router-dom';
+import { useState } from 'react';
+import AppContext from './context/AppContext';
+import Header from './components/Header';
+import Results from './components/Results';
+import Content from './components/Content';
+import './App.scss';
+import AddRecipeModal from './components/AddRecipeModal';
 
 function App() {
+  const [isOverlayActive, setOverlayActive] = useState(false);
+  const toggleOverlay = () => {
+    setOverlayActive(!isOverlayActive);
+  };
+
+  // Handle Escape
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') toggleOverlay();
+  };
+
+  // Handle click outside the modal
+  const handleClick = () => {
+    isOverlayActive && setOverlayActive(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContext>
+      <div className="container" onKeyDown={handleEscape}>
+        <Header handleAddRecipe={toggleOverlay} />
+        <Results />
+        <HashRouter>
+          <Content />
+        </HashRouter>
+      </div>
+      <div
+        className={`overlay ${isOverlayActive ? '' : 'hidden'}`}
+        onClick={handleClick}
+      ></div>
+      <AddRecipeModal
+        isActive={isOverlayActive}
+        handleClose={toggleOverlay}
+        handleEscape={handleEscape}
+      />
+    </AppContext>
   );
 }
 
